@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Input Form</title>
+</head>
+<body>
+    <h1>Send Text to Flask Backend</h1>
+    
+    <form id="textForm">
+        <label for="userText">Enter Text:</label><br><br>
+        <input type="text" id="userText" name="userText" required><br><br>
+        <button type="submit">Send</button>
+    </form>
+
+    <p id="response"></p>
+
+    <script>
+        // Handle form submission
+        document.getElementById('textForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent the form from refreshing the page
+
+            // Get the value of the text input
+            const userText = document.getElementById('userText').value;
+
+            try {
+                // Send a POST request to the backend
+                const response = await fetch('/submit-text', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ userText: userText }),
+                });
+
+                // Handle the response
+                const result = await response.json();
+                document.getElementById('response').innerText = 'Response from backend: ' + result.message;
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('response').innerText = 'An error occurred';
+            }
+        });
+    </script>
+</body>
+</html>
