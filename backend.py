@@ -7,15 +7,16 @@ import math
 
 class Backend:
     def __init__(self):
-        self.Transcribe_model = whisper.load_model("base")
+        self.transcribe_model = whisper.load_model("base")
         self.summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
+        self.filename = ''
 
-    def Video_to_Mp3(self, link):
+    def video_to_mp3(self, link):
         try:
             yt = YouTube(link)
             stream = yt.streams.get_highest_resolution()
             video_file = stream.download(output_path='saved_mp3')
-            
+
             print(f"Downloaded: {yt.title} successfully!")
 
             mp3_file = video_file.replace(".mp4", ".mp3")
@@ -27,36 +28,37 @@ class Backend:
 
             os.remove(video_file)
             print(f"Deleted MP4 file: {video_file} successfully!")
-            
-            return mp3_file
+
+            self.filename = mp3_file  # Correctly assign the filename
         
         except Exception as e:
             print(f"An error occurred: {e}")
             return None  
 
-    def transcribe(self, fileName):
-        result = self.Transcribe_model.transcribe(f"saved_mp3/{fileName}.mp3")
-        return result['text'] 
+    def __transcribe(self):
+        # Use self.filename instead of self.fileName
+        result = self.transcribe_model.transcribe(self.filename)
+        return result['text']
 
-    def breakDown(self, text, max_length=1024):
+    def __break_down(self, text, max_length=1024):
         """Breaks the text into smaller chunks."""
         tokens = self.summarizer.tokenizer.encode(text, truncation=False)
         num_chunks = math.ceil(len(tokens) / max_length)
-        
+
         chunks = []
         for i in range(num_chunks):
             start = i * max_length
             end = start + max_length
             chunk = tokens[start:end]
             chunks.append(self.summarizer.tokenizer.decode(chunk, skip_special_tokens=True))
-        
+
         return chunks
 
-    def sumUp(self, fileName):
-        transcribed_text = self.transcribe(fileName)
+    def sum_up(self):
+        transcribed_text = self.__transcribe()
         
         if transcribed_text:
-            chunks = self.breakDown(transcribed_text)
+            chunks = self.__break_down(transcribed_text)
             summaries = []
 
             for chunk in chunks:

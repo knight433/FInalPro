@@ -1,4 +1,4 @@
-import backend
+from backend import Backend
 
 def read_text_file(file_path):
     try:
@@ -15,3 +15,7 @@ def read_text_file(file_path):
 if __name__ == "__main__":
     file_path = 'sample.txt'    
     file_content = read_text_file(file_path)
+
+    obj = Backend()
+    obj.video_to_mp3('https://www.youtube.com/watch?v=Hoixgm4-P4M')
+    print(obj.sum_up())
