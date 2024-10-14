@@ -3,45 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Text Input Form</title>
+    <title>YouTube Video Summarizer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            margin-right: 10px;
+        }
+        input[type="submit"] {
+            padding: 10px;
+        }
+        .result {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Send Text to Flask Backend</h1>
-    
-    <form id="textForm">
-        <label for="userText">Enter Text:</label><br><br>
-        <input type="text" id="userText" name="userText" required><br><br>
-        <button type="submit">Send</button>
+    <h1>YouTube Video Summarizer</h1>
+    <form action="/process_video" method="POST">
+        <input type="text" name="link" placeholder="Enter YouTube video URL" required>
+        <input type="submit" value="Summarize">
     </form>
 
-    <p id="response"></p>
+    {% if summary %}
+        <div class="result">
+            <h2>Summary for: {{ title }}</h2> 
+            <p>{{ summary }}</p>
+        </div>
+    {% endif %}
 
-    <script>
-        // Handle form submission
-        document.getElementById('textForm').addEventListener('submit', async function(event) {
-            event.preventDefault(); // Prevent the form from refreshing the page
-
-            // Get the value of the text input
-            const userText = document.getElementById('userText').value;
-
-            try {
-                // Send a POST request to the backend
-                const response = await fetch('/submit-text', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ userText: userText }),
-                });
-
-                // Handle the response
-                const result = await response.json();
-                document.getElementById('response').innerText = 'Response from backend: ' + result.message;
-            } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('response').innerText = 'An error occurred';
-            }
-        });
-    </script>
+    {% if error %}
+        <div class="result" style="color: red;">
+            <p>{{ error }}</p>
+        </div>
+    {% endif %}
 </body>
 </html>
